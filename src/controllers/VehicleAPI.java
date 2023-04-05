@@ -11,25 +11,238 @@ import java.util.*;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
+public class VehicleAPI implements Serializer{
 
-public class VehicleAPI { // todo implements Serializer {   (when load and saved written, include the 'implements Serializer here)
+    private List<Vehicle> vehicles = new ArrayList<Vehicle>();
 
- // more private fields here (file)
+    private File file;
 
-    //TODO refer to the spec and add in the required methods here (make note of which methods are given to you first!)
+    public VehicleAPI(File file) {
+        this.file = file;
+    }
 
+    public void sortByCarbonFootprintDescending() {
+    }
 
+    public String listAllCarbonFuelsByFuelType(String fuelType) {
+       if(FuelTypeUtility.validFuelType(fuelType)) {
+          String str = "";
+          for(Vehicle vehicle : vehicles) {
+              if(((CarbonFuelCar) vehicle).getFuelType() == fuelType)
+                  str += vehicle;
+              if(str != "")
+                  return str;
+              return "No vehicles with " + fuelType + " exists";
+          }
+       }
+       return "Invalid fuel type entered";
+    }
 
+    public String listAllVehiclesAfterAGivenYear(int year) {
+        String str = "";
+        for(Vehicle vehicle : vehicles)
+            if(vehicle.getYear() >= year)
+                str += vehicle;
+        if(str != "")
+            return str;
+        return "No vehicles exist later than " + year;
+    }
+
+    public Vehicle getVehicleByRegNumber(String regNumber) {
+        for(Vehicle vehicle: vehicles)
+            if (vehicle.getRegNumber().equals(regNumber))
+                return vehicle;
+        return null;
+    }
+
+    public boolean updateElectricCar(String string, ElectricCar electricCar) {
+        return false;
+    }
+
+    public void sortByCostDescending() {
+        for (int i = vehicles.size() -1; i >= 0; i--)
+        {
+            int highestIndex = 0;
+            for (int j = 0; j <= i; j++)
+            {
+                if (vehicles.get(j).getCost() > vehicles.get(highestIndex).getCost()) {
+                    highestIndex = j;
+                }
+            }
+            swapProducts(vehicles, i, highestIndex);
+        }
+    }
+
+    public boolean updateCarbonFuelCar(String string, CarbonFuelCar carbonFuelCar) {
+        return false;
+    }
+
+    public boolean updateScooter(String string, Scooter scooter) {
+        return false;
+    }
+
+    public int numberOfVehicleByChosenManufacturer(Manufacturer manufacturer) {
+        return -1;
+    }
+
+    public int numberOfScooters() {
+        int num = 0;
+        for(Vehicle vehicle : vehicles)
+            if(vehicle instanceof Scooter)
+                num++;
+        return num;
+    }
+
+    public String listAllVehiclesEqualToAGivenYear(int year) {
+        String str = "";
+        for(Vehicle vehicle : vehicles)
+            if(vehicle.getYear() == year)
+                str += vehicle;
+        if(str != "")
+            return str;
+        return "No vehicles exist for " + year;
+    }
+
+    public void sortByCarbonFootprintAscending() {
+        for (int i = vehicles.size() -1; i >= 0; i--)
+        {
+            int lowestIndex = 0;
+            for (int j = 0; j <= i; j++)
+            {
+                if (vehicles.get(j).getCarbonFootPrint() > vehicles.get(lowestIndex).getCarbonFootPrint()) {
+                    lowestIndex = j;
+                }
+            }
+            swapProducts(vehicles, i, lowestIndex);
+        }
+    }
+
+    public String listAllElectricCars() {
+        if(!vehicles.isEmpty()) {
+            String str = "";
+            for(Vehicle electricCar : vehicles)
+                if(electricCar instanceof ElectricCar)
+                    str += electricCar;
+            return str;
+        }
+        return "No Electric Cars";
+    }
+
+    public String listAllScooters() {
+        if(!vehicles.isEmpty()) {
+            String str = "";
+            for(Vehicle scooter : vehicles)
+                if(scooter instanceof Scooter)
+                    str += scooter;
+            return str;
+        }
+        return "No Scooters";
+    }
+
+    public String listAllCarbonFuelCars() {
+        if(!vehicles.isEmpty()) {
+            String str = "";
+            for(Vehicle carbonFuelCar : vehicles)
+                if(carbonFuelCar instanceof CarbonFuelCar)
+                    str += carbonFuelCar;
+            return str;
+        }
+        return "No Carbon Fuel Cars";
+    }
+
+    public Vehicle getVehicleByIndex(int index) {
+        if(Utilities.isValidIndex(vehicles, index))
+            return vehicles.get(index);
+        return null;
+    }
+
+    public int numberOfCarbonCars() {
+        int num = 0;
+        for(Vehicle vehicle : vehicles)
+            if(vehicle instanceof CarbonFuelCar)
+                num++;
+        return num;
+    }
+
+    public String listAllVehicles() {
+        if(!vehicles.isEmpty()) {
+            String str = "";
+            for(Vehicle vehicle : vehicles)
+                str += vehicle;
+            return str;
+        }
+        return "No vehicles";
+    }
+
+    public List<Vehicle> topFiveCarbonVehicles() {
+        return null;
+    }
+
+    public Vehicle deleteVehicleByRegNumber(String regNumber) {
+        for(Vehicle vehicle: vehicles)
+            if (vehicle.getRegNumber().equals(regNumber)) {
+                Vehicle vehicleRemoved = vehicle;
+                vehicles.remove(vehicle);
+                return vehicleRemoved;
+            }
+        return null;
+    }
+
+    public int numberOfVehicles() {
+        return vehicles.size();
+    }
+
+    public int numberOfElectricCars() {
+        int num = 0;
+        for(Vehicle vehicle : vehicles)
+            if(vehicle instanceof ElectricCar)
+                num++;
+        return num;
+    }
+
+    public boolean addVehicle(Vehicle vehicle) {
+        return vehicles.add(vehicle);
+    }
+
+    public void sortByAgeAscending() {
+        for (int i = vehicles.size() -1; i >= 0; i--)
+        {
+            int lowestIndex = 0;
+            for (int j = 0; j <= i; j++)
+            {
+                if (vehicles.get(j).getAge() > vehicles.get(lowestIndex).getCost()) {
+                    lowestIndex = j;
+                }
+            }
+            swapProducts(vehicles, i, lowestIndex);
+        }
+    }
+
+    public String listAllVehicleByChosenManufacturer(Manufacturer manufacturer) {
+        return null;
+    }
+
+    public Vehicle deleteVehicleByIndex(int index) {
+        if(Utilities.isValidIndex(vehicles, index))
+            return vehicles.remove(index);
+        return null;
+    }
 
     // checks if regNumber is a new reg number i.e. it does not already exist in the collection
-//    public boolean isValidNewRegNumber(String regNumber){
-//        for(Vehicle vehicle: vehicles)     //todo - declare and instantiate vehicles
-//            if (vehicle.getRegNumber().equals(regNumber))
-//                return false;
-//        return true;
-//    }
+    public boolean isValidNewRegNumber(String regNumber){
+        for(Vehicle vehicle: vehicles)
+            if (vehicle.getRegNumber().equals(regNumber))
+                return false;
+        return true;
+    }
 
+    private void swapProducts(List<Vehicle> vehicles, int i, int j) {
+        Vehicle smaller = vehicles.get(i);
+        Vehicle bigger = vehicles.get(j);
 
+        vehicles.set(i,bigger);
+        vehicles.set(j,smaller);
+    }
 
     //---------------------
     // Persistence methods
@@ -40,22 +253,22 @@ public class VehicleAPI { // todo implements Serializer {   (when load and saved
      *
      * @throws Exception An exception is thrown if an error occurred during the load e.g. a missing file.
      */
-//    @SuppressWarnings("unchecked")
-//    public void load() throws Exception {
-//        //list of classes that you wish to include in the serialisation, separated by a comma
-//        Class<?>[] classes = new Class[]{Vehicle.class, Car.class, CarbonFuelCar.class,
-//                                            ElectricCar.class, Scooter.class, Manufacturer.class};
-//
-//        //setting up the xstream object with default security and the above classes
-//        XStream xstream = new XStream(new DomDriver());
-//        XStream.setupDefaultSecurity(xstream);
-//        xstream.allowTypes(classes);
-//
-//        //doing the actual serialisation to an XML file
-//        ObjectInputStream in = xstream.createObjectInputStream(new FileReader(file));
-//        vehicles = (List<Vehicle>) in.readObject();
-//        in.close();
-//    }
+    @SuppressWarnings("unchecked")
+    public void load() throws Exception {
+        //list of classes that you wish to include in the serialisation, separated by a comma
+        Class<?>[] classes = new Class[]{Vehicle.class, Car.class, CarbonFuelCar.class,
+                                            ElectricCar.class, Scooter.class, Manufacturer.class};
+
+        //setting up the xstream object with default security and the above classes
+        XStream xstream = new XStream(new DomDriver());
+        XStream.setupDefaultSecurity(xstream);
+        xstream.allowTypes(classes);
+
+        //doing the actual serialisation to an XML file
+        ObjectInputStream in = xstream.createObjectInputStream(new FileReader(file));
+        vehicles = (List<Vehicle>) in.readObject();
+        in.close();
+    }
 
     /**
      * The save method uses the XStream component to write all the objects in the ArrayList
@@ -63,16 +276,16 @@ public class VehicleAPI { // todo implements Serializer {   (when load and saved
      *
      * @throws Exception An exception is thrown if an error occurred during the save e.g. drive is full.
      */
-//    public void save() throws Exception {
-//        XStream xstream = new XStream(new DomDriver());
-//        ObjectOutputStream out = xstream.createObjectOutputStream(new FileWriter(file));
-//        out.writeObject(vehicles);
-//        out.close();
-//    }
-//
-//    public String fileName(){
-//        return this.file.toString();
-//    }
+    public void save() throws Exception {
+        XStream xstream = new XStream(new DomDriver());
+        ObjectOutputStream out = xstream.createObjectOutputStream(new FileWriter(file));
+        out.writeObject(vehicles);
+        out.close();
+    }
+
+    public String fileName(){
+        return this.file.toString();
+    }
 
 
 }

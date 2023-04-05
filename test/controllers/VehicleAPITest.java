@@ -1,6 +1,9 @@
 package controllers;
 
+import models.CarbonFuelCar;
+import models.ElectricCar;
 import models.Manufacturer;
+import models.Scooter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
