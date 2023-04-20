@@ -4,12 +4,13 @@ import controllers.ManufacturerAPI;
 import controllers.VehicleAPI;
 import models.Manufacturer;
 import utils.ScannerInput;
+import javax.swing.JOptionPane;
 
 import java.io.File;
 
 public class Driver {
 
-
+        JOptionPane frame = new JOptionPane();
 
         private VehicleAPI vehicleAPI;
         private ManufacturerAPI manufacturerAPI;
@@ -28,22 +29,21 @@ public class Driver {
         }
 
     private int mainMenu() {
-        System.out.println("""
+        return Integer.parseInt(JOptionPane.showInputDialog(frame, """
                          -------Vehicle Store-------------
-                        |  1) Manufacturer CRUD MENU     |
-                        |  2) Vehicle Store CRUD MENU    |
-                        |  3) Reports MENU               |
-                        |--------------------------------|
-                        |  4) Search Manufacturers       |
-                        |  5) Search Vehicles            |  
-                        |  6) Sort Vehicles              | 
-                        |--------------------------------|
-                        |  10) Save all                  |
-                        |  11) Load all                  |
-                        |--------------------------------|
-                        |  0) Exit                       |
-                         --------------------------------""");
-        return ScannerInput.readNextInt("==>> ");
+                        1) Manufacturer CRUD MENU
+                        2) Vehicle Store CRUD MENU
+                        3) Reports MENU
+                        --------------------------------
+                        4) Search Manufacturers
+                        5) Search Vehicles
+                        6) Sort Vehicles
+                        --------------------------------
+                        10) Save all
+                        11) Load all
+                        --------------------------------
+                        0) Exit
+                        --------------------------------""", "Vehicle Store"));
     }
 
         private void runMainMenu() {
@@ -60,7 +60,6 @@ public class Driver {
                     case 11 -> loadAllData();
                     default ->  System.out.println("Invalid option entered" + option);
                 }
-                ScannerInput.readNextLine("\n Press the enter key to continue");
                 option = mainMenu();
             }
             exitApp();
@@ -76,16 +75,15 @@ public class Driver {
         //  Developer Menu Items
         //----------------------
         private int manufacturerMenu() {
-            System.out.println("""
-                --------Manufacturer Menu---------
-               |  1) Add a manufacturer           |
-               |  2) Delete a manufacturer        |
-               |  3) Update manufacturer details  |
-               |  4) List all manufacturers       |
-               |  5) Find a manufacturer          |
-               |  0) Return to main menu          |
-                ----------------------------------""");
-            return ScannerInput.readNextInt("==>>");
+            return Integer.parseInt(JOptionPane.showInputDialog("""
+               --------Manufacturer Menu---------
+               1) Add a manufacturer
+               2) Delete a manufacturer
+               3) Update manufacturer details
+               4) List all manufacturers
+               5) Find a manufacturer
+               0) Return to main menu
+               ----------------------------------"""));
         }
 
         private void runManufacturerMenu() {

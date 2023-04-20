@@ -39,25 +39,25 @@ public class VehicleAPITest {
         // Scooter Validation Rules:
         //    power (250 -> 1000, default 250), weight (5 -> 100, default 5), topRiderWeight (100 -> 120, default 100)
         scooterBelowBoundary = new Scooter("SCOOT12", "Scootn1 Master", 999,
-                ford, 1999, 119, 4, 99);
+                ford, 1999, 249, 4, 99);
 
         scooterOnBoundary = new Scooter("SCOOT321", "MasterScooter-3", 1000,
-                kia, 2000, 120, 5, 100);
+                kia, 2000, 250, 5, 100);
 
         scooterAboveBoundary = new Scooter("SC 123456", "Speed Scooter X1", 1001,
-                tesla, 2001, 121, 6, 101);
+                tesla, 2023, 250, 101, 120);
 
         scooterInvalidData = new Scooter(null, null, -1,
                 null, -1, -1, -1, -1);
 
 
         //Validation: appSize(1-1000), appVersion(>=1.0), ageRating (0-18), appCost(>=0),
-        electricCarBelowBoundary = new ElectricCar("Elec987","Electric 12111", 999, mazda, 2020, 120, 5, 100, 100, 50, 100);
+        electricCarBelowBoundary = new ElectricCar("Elec987","Electric 12111", 999, mazda, 1999, 119, 3, 49, 99, 39, 99);
 
        electricCarOnBoundary = new ElectricCar("Elec5678", "Electric 123456", 1000, kia, 2000, 120, 4, 50, 100, 40, 100);
 
         electricCarAboveBoundary = new ElectricCar("Elec12345", "Electric 1234567", 1001,
-                tesla, 2001, 121, 5, 51, 101, 41, 101);
+                tesla, 2024, 301, 26, 3001, 401, 61, 501);
 
         electricCarInvalidData = new ElectricCar(null, null, -1,
                 null, -1, -1, -1, -1, -1, -1, -1);
@@ -75,8 +75,8 @@ public class VehicleAPITest {
                 5, 1, 800, false);
 
         carbonFuelAboveBoundary = new CarbonFuelCar("Car345678", "Carbon Car 12345", 1001,
-                tesla, 2001, 121, 5, 51, 101, "petrol",
-                6, 2, 801, false);
+                tesla, 2024, 301, 26, 3001, 401, "petrol",
+                21, 10, 2501, false);
 
         carbonFuelInvalidData = new CarbonFuelCar(null, null, -1,
                 null, -1, -1, -1, -1, -1, null,

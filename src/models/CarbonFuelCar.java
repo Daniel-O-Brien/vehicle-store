@@ -3,11 +3,13 @@ package models;
 import utils.FuelTypeUtility;
 import utils.Utilities;
 
+import java.util.Objects;
+
 public class CarbonFuelCar extends Car {
 
     private float fuelConsumption = 5;
 
-    private float carbonEmission  = 1;
+    private float carbonEmission = 1;
 
     private boolean automatic = false;
 
@@ -16,7 +18,7 @@ public class CarbonFuelCar extends Car {
     private int engineSize = 800;
 
     public CarbonFuelCar(String regNumber, String model, float cost, Manufacturer manufacturer, int year, int power, int secs0To60, int topSpeed, float torque, String fuelType, float fuelConsumption, float carbonEmission, int engineSize, boolean automatic) {
-        super(regNumber, model, cost, manufacturer, year, secs0To60, power, torque, topSpeed);
+        super(regNumber, model, cost, manufacturer, year, power, secs0To60, topSpeed, torque);
         setFuelConsumption(fuelConsumption);
         setCarbonEmission(carbonEmission);
         setAutomatic(automatic);
@@ -55,8 +57,16 @@ public class CarbonFuelCar extends Car {
     }
 
     public void setFuelType(String fuelType) {
-        if(FuelTypeUtility.validFuelType(fuelType))
             this.fuelType = fuelType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        CarbonFuelCar that = (CarbonFuelCar) o;
+        return Float.compare(that.getFuelConsumption(), getFuelConsumption()) == 0 && Float.compare(that.getCarbonEmission(), getCarbonEmission()) == 0 && isAutomatic() == that.isAutomatic() && getEngineSize() == that.getEngineSize() && Objects.equals(getFuelType(), that.getFuelType());
     }
 
     public int getEngineSize() {
@@ -64,7 +74,7 @@ public class CarbonFuelCar extends Car {
     }
 
     public void setEngineSize(int engineSize) {
-        if(Utilities.validRange(engineSize, 600, 2500))
+        if(Utilities.validRange(engineSize, 800, 2500))
             this.engineSize = engineSize;
     }
 
@@ -72,3 +82,4 @@ public class CarbonFuelCar extends Car {
         return (engineSize * fuelConsumption * carbonEmission * super.getAge()) / 2000;
     }
 }
+

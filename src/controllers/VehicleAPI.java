@@ -13,7 +13,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class VehicleAPI implements Serializer{
 
-    private List<Vehicle> vehicles = new ArrayList<Vehicle>();
+    private List<Vehicle> vehicles = new ArrayList<>();
 
     private File file;
 
@@ -63,7 +63,7 @@ public class VehicleAPI implements Serializer{
         for (int i = vehicles.size() -1; i >= 0; i--)
         {
             int highestIndex = 0;
-            for (int j = 0; j <= i; j++)
+            for (int j = 1; j < i; j++)
             {
                 if (vehicles.get(j).getCost() > vehicles.get(highestIndex).getCost()) {
                     highestIndex = j;
@@ -201,7 +201,9 @@ public class VehicleAPI implements Serializer{
     }
 
     public boolean addVehicle(Vehicle vehicle) {
-        return vehicles.add(vehicle);
+        if(vehicle.getRegNumber() != null)
+            return vehicles.add(vehicle);
+        return false;
     }
 
     public void sortByAgeAscending() {
@@ -219,7 +221,16 @@ public class VehicleAPI implements Serializer{
     }
 
     public String listAllVehicleByChosenManufacturer(Manufacturer manufacturer) {
-        return null;
+        if(!vehicles.isEmpty()) {
+            String str = "";
+            for (Vehicle vehicle : vehicles)
+                if (vehicle.getManufacturer() == manufacturer)
+                    str += vehicle;
+            if(str != "")
+                return str;
+            return "There are no vehicles who have " + manufacturer + " in the list";
+        }
+        return "No Vehicles added";
     }
 
     public Vehicle deleteVehicleByIndex(int index) {

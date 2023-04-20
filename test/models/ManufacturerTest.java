@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-//todo need to 'unexclude' the test folder
 class ManufacturerTest {
     Manufacturer manValid, manInvalid, manBorder, manBelowBorder, manEmpty;
 

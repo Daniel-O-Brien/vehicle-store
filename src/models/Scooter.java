@@ -60,9 +60,9 @@ public class Scooter extends Vehicle{
     }
 
     public String toString() {
-        return "Scooter{" +
+        return "Scooter{" + super.toString() +
                 "power=" + power +
-                ", weight=" + weight +
+                ", Weight : " + weight +
                 ", topRiderWeight=" + topRiderWeight +
                 '}';
     }

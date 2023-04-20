@@ -14,9 +14,12 @@ public abstract class Car extends Vehicle {
 
     private int topSpeed = 50;
 
-    public Car(String regNumber, String model, float cost, Manufacturer manufacturer, int year, int secs0To60, int power, float torque, int topSpeed) {
+    public Car(String regNumber, String model, float cost, Manufacturer manufacturer, int year, int power, int secs0To60, int topSpeed, float torque) {
         super(regNumber, model, cost, manufacturer, year);
-
+        setPower(power);
+        setSecs0To60(secs0To60);
+        setTopSpeed(topSpeed);
+        setTorque(torque);
     }
 
     public int getSecs0To60() {
