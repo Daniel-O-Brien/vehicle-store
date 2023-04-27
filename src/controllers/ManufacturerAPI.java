@@ -11,7 +11,6 @@ import models.*;
 import utils.Serializer;
 
 import static utils.Utilities.isValidIndex;
-//todo include Manufacturer API into starter code
 public class ManufacturerAPI  implements Serializer {
 
     private List<Manufacturer> manufacturers = new ArrayList<>();
@@ -66,14 +65,14 @@ public class ManufacturerAPI  implements Serializer {
         }
     }
     public String listAllVehiclesByManufacturerName(String manuName){
-        if (!manufacturers.isEmpty()) {
+        if (isValidManufacturer(manuName)) {
             String listManufacturers = "";
             for (Manufacturer manufacturer : manufacturers) {
                 if (manufacturer.equals(manuName))
                     listManufacturers += manufacturers.indexOf(manufacturer) + ": " + manufacturer + "\n";
             }
             if (listManufacturers.equals("")) {
-                return "No manufacturers of that name";
+                return "No vehicles by that manufacturer";
             } else {
                 return listManufacturers;
             }

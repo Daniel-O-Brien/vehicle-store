@@ -55,6 +55,17 @@ public class VehicleAPI implements Serializer{
         return null;
     }
 
+    public String listAllVehicles() {
+        if(vehicles != null) {
+            String str = "";
+            for (Vehicle vehicle : vehicles)
+                str += vehicle;
+            return str;
+        }
+        return "No Vehicles";
+
+    }
+
     public boolean updateElectricCar(String string, ElectricCar electricCar) {
         return false;
     }
@@ -162,16 +173,6 @@ public class VehicleAPI implements Serializer{
             if(vehicle instanceof CarbonFuelCar)
                 num++;
         return num;
-    }
-
-    public String listAllVehicles() {
-        if(!vehicles.isEmpty()) {
-            String str = "";
-            for(Vehicle vehicle : vehicles)
-                str += vehicle;
-            return str;
-        }
-        return "No vehicles";
     }
 
     public List<Vehicle> topFiveCarbonVehicles() {

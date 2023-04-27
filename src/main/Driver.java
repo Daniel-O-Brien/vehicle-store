@@ -1,12 +1,26 @@
 package main;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 import controllers.ManufacturerAPI;
 import controllers.VehicleAPI;
+import models.CarbonFuelCar;
+import models.ElectricCar;
 import models.Manufacturer;
-import utils.ScannerInput;
+import models.Scooter;
+import utils.Utilities;
+
 import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.*;
+import static java.lang.Integer.parseInt;
+import static java.lang.Float.parseFloat;
+import static utils.Utilities.tryParseFloat;
+import static utils.Utilities.tryParseInt;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.ObjectOutputStream;
+
 
 public class Driver {
 
@@ -21,16 +35,15 @@ public class Driver {
 
         public void start() {
 
-//            vehicleAPI = new VehicleAPI(new File("vehicles.xml"));   //todo - write constructor for VehicleAPi
+            vehicleAPI = new VehicleAPI(new File("vehicles.xml"));
             manufacturerAPI = new ManufacturerAPI(new File("manufacturers.xml"));
 
-            loadAllData();  //load all data once the serializers are set up
+            loadAllData();
             runMainMenu();
         }
 
-    private int mainMenu() {
-        return Integer.parseInt(JOptionPane.showInputDialog(frame, """
-                         -------Vehicle Store-------------
+    private String mainMenu() {
+        return showInputDialog(frame, """
                         1) Manufacturer CRUD MENU
                         2) Vehicle Store CRUD MENU
                         3) Reports MENU
@@ -43,22 +56,22 @@ public class Driver {
                         11) Load all
                         --------------------------------
                         0) Exit
-                        --------------------------------""", "Vehicle Store"));
+                        --------------------------------""", "Vehicle Store", PLAIN_MESSAGE);
     }
 
         private void runMainMenu() {
-            int option = mainMenu();
-            while (option != 0) {
-                switch (option) {
+            String option = mainMenu();
+            while ((option != null) && (parseInt(option) != 0)) {
+                switch (parseInt(option)) {
                     case 1-> runManufacturerMenu();
-                   // case 2 -> TODO run the Vehicle Store Menu and the associated methods (your design here)
-                   // case 3 -> TODO run the Reports Menu and the associated methods (your design here)
+                    case 2 -> runVehicleStoreMenu();
+                    case 3 -> reportsMenu();
                     //case 4 -> TODO run the search Manufacturers menu and associated methods (your design here)
                    // case 5 ->TODO run the search Vehicles menu and associated methods (your design here)
                     // case 6 ->TODO sorting menu and associated (your design here)
                     case 10 -> saveAllData();
                     case 11 -> loadAllData();
-                    default ->  System.out.println("Invalid option entered" + option);
+                    default -> showMessageDialog(frame, "Invalid option entered: " + option, "Error", ERROR_MESSAGE);
                 }
                 option = mainMenu();
             }
@@ -67,91 +80,91 @@ public class Driver {
 
         private void exitApp(){
             saveAllData();
-            System.out.println("Exiting....");
-            System.exit(0);
+            int option = showConfirmDialog(frame, "Are you sure you want to exit?", "Exit App", YES_NO_OPTION, QUESTION_MESSAGE);
+            if(option == 0)
+                System.exit(0);
+            else
+                runMainMenu();
         }
 
         //----------------------
         //  Developer Menu Items
         //----------------------
-        private int manufacturerMenu() {
-            return Integer.parseInt(JOptionPane.showInputDialog("""
-               --------Manufacturer Menu---------
+        private String manufacturerMenu() {
+            return showInputDialog(frame, """
                1) Add a manufacturer
                2) Delete a manufacturer
                3) Update manufacturer details
                4) List all manufacturers
                5) Find a manufacturer
+               6) List vehicles by manufacturer name
                0) Return to main menu
-               ----------------------------------"""));
+               ----------------------------------""", "Manufacturer Menu", PLAIN_MESSAGE);
         }
 
         private void runManufacturerMenu() {
-            int option = manufacturerMenu();
-            while (option != 0) {
-                switch (option) {
+            String option = manufacturerMenu();
+            while ((option != null) && (parseInt(option) != 0)) {
+                switch (parseInt(option)) {
                     case 1 -> addManufacturer();
                     case 2 -> deleteManufacturer();
                     case 3 -> updateManufacturer();
-                    case 4 -> System.out.println(manufacturerAPI.listManufacturers());
-                    case 5-> findManufacturer();
-                    case 6-> listVehiclesByManufacturerName();
-                    default->  System.out.println("Invalid option entered" + option);
+                    case 4 -> JOptionPane.showMessageDialog(frame, manufacturerAPI.listManufacturers());
+                    case 5 -> findManufacturer();
+                    case 6 -> listVehiclesByManufacturerName();
+                    default->  JOptionPane.showMessageDialog(frame, "Invalid option entered: " + option, "Error", ERROR_MESSAGE);
                 }
-                ScannerInput.readNextLine("\n Press the enter key to continue");
                 option = manufacturerMenu();
             }
+            runMainMenu();
         }
 
         private void addManufacturer() {
-            String manufacturerName = ScannerInput.readNextLine("Please enter the manufacturer name: ");
-            int manufacturerNumEmployees = ScannerInput.readNextInt("Please enter the number of employees: ");
+            String manufacturerName = showInputDialog(frame, "Please enter the manufacturer name: ", "Add Manufacturer", QUESTION_MESSAGE);
+            int manufacturerNumEmployees = Integer.parseInt(showInputDialog(frame, "Please enter the number of employees: ", "Add Manufacturer", QUESTION_MESSAGE));
 
             if (manufacturerAPI.addManufacturer(new Manufacturer(manufacturerName, manufacturerNumEmployees))){
-                System.out.println("Add successful");
+                showMessageDialog(frame, "Add successful", "Add Manufacturer", INFORMATION_MESSAGE);
             }
             else{
-                System.out.println("Add not successful");
+                showMessageDialog(frame, "Add not successful", "Add Manufacturer", ERROR_MESSAGE);
             }
         }
 
         private void deleteManufacturer() {
-            String manufacturerName = ScannerInput.readNextLine("Please enter the developer name: ");
+            String manufacturerName = showInputDialog(frame, "Please enter the manufacturer name: ", "Delete Manufacturer", QUESTION_MESSAGE);
             if (manufacturerAPI.removeManufacturerByName(manufacturerName) != null){
-                System.out.println("Delete successful");
+                showMessageDialog(frame, "Delete successful", "Delete Manufacturer", INFORMATION_MESSAGE);
             }
             else{
-                System.out.println("Delete not successful");
+                showMessageDialog(frame, "Delete not successful", "Delete Manufacturer", ERROR_MESSAGE);
             }
         }
 
         private void updateManufacturer(){
             Manufacturer manufacturer = getManufacturerByName();
             if (manufacturer != null){
-                int numEmployees= ScannerInput.readNextInt("Please enter number of Employees: ");
+                int numEmployees= parseInt(showInputDialog(frame, "Please enter number of Employees: ", "Update Manufacturer", QUESTION_MESSAGE));
                 if (manufacturerAPI.updateManufacturer(manufacturer.getManufacturerName(), numEmployees))
-                    System.out.println("Number of Employees Updated");
+                    showMessageDialog(frame, "Number of Employees Updated", "Update Manufacturer", INFORMATION_MESSAGE);
                 else
-                    System.out.println("Number of Employees NOT Updated");
+                    showMessageDialog(frame, "Number of Employees NOT Updated", "Update Manufacturer", ERROR_MESSAGE);
             }
             else
-                System.out.println("Manufacturer name is NOT valid");
+                showMessageDialog(frame, "Manufacturer name is NOT valid");
         }
 
-        private void findManufacturer(){
-            Manufacturer developer = getManufacturerByName();
-            if (developer == null){
-                System.out.println("No such manufacturer exists");
-            }
-            else{
-                System.out.println(developer);
-            }
+        private void findManufacturer() {
+            Manufacturer manufacturer = getManufacturerByName();
+            if (manufacturer != null)
+                showMessageDialog(frame, manufacturer);
+            else
+                showMessageDialog(frame, "No such manufacturer exists", "Find Manufacturer", ERROR_MESSAGE);
         }
 
         private void listVehiclesByManufacturerName(){
-            String manufacturer = ScannerInput.readNextLine("Enter the manufacturer's name:  ");
-
-            System.out.println(manufacturerAPI.listAllVehiclesByManufacturerName(manufacturer));
+            String manufacturer = showInputDialog(frame, "Enter the manufacturer's name:", "List Vehicles By Manufacturer Name", QUESTION_MESSAGE);
+            showMessageDialog(frame, manufacturerAPI.listAllVehiclesByManufacturerName(manufacturer));
         }
 
 
@@ -159,69 +172,138 @@ public class Driver {
         //  App Store Menu
         //---------------------
 
+    private String vehicleStoreMenu() {
+        return showInputDialog(frame, """
+                1) Add a vehicle
+                2) Delete a vehicle
+                3) List all vehicles
+                4) Update vehicle
+                0) Return to main menu """, "Vehicle Store Menu", PLAIN_MESSAGE);
 
-        // public Vehicle(String regNumber, String  model, float cost, Manufacturer manufacturer, int  year) {
-        private void addVehicle(){
-            int vehicleType =  ScannerInput.readNextInt("""
-        Which type of vehicle do you wish to add? 
-        1) Carbon Fuel Car
-        2) Electric Car
-        3) Scooter """);
+    }
 
-//            Manufacturer manufacturer = getManufacturerByName();
-//            if (manufacturer != null){
-//                String regNumber = ScannerInput.readNextLine("Please enter Reg number of new Vehicle: ");
-//
-//
-//                if (vehicleAPI.isValidNewRegNumber(regNumber)){
-//                    String  model = ScannerInput.readNextLine("\tmodel : ");
-//                    float cost = ScannerInput.readNextFloat("\tcost : ");
-//                    int  year = ScannerInput.readNextInt("\tYear of registration");
-//                    switch (vehicleType) {
-//                        case 1, 2 -> {
-//                            int power = ScannerInput.readNextInt("\tpower : ");
-//                            int    secs0To60 = ScannerInput.readNextInt("\ttime from 0 to 60 :  ");
-//                            int  topSpeed = ScannerInput.readNextInt("\ttop speed : ");
-//                            float torque = ScannerInput.readNextFloat("\tpower: ");
-//                            switch (vehicleType) {
-//                                case 1-> {
-//                                    //TODO Carbon Fuel Car -
-//                                   }
-//                                case 2 -> {
-//                                    //TODO Electric Car   -
-//                                 }
-//                            }
-//                        }
-//                        case 3 -> {
-//                            //Scooter
-//
-//                            int power = ScannerInput.readNextInt("\tpower : ");
-//                            float weight = ScannerInput.readNextFloat("\tweight : ");
-//                            int topRiderWeight = ScannerInput.readNextInt("\ttop rider weight");
-//          // todo - write addVehicle(.)                  vehicleAPI.addVehicle(new Scooter(regNumber, model, cost, manufacturer, year, power, weight,topRiderWeight));
-//
-//                        }
-//                    }
-//            }
-//                else{
-//                    System.out.println("Vehicle reg number  already exists.");
-//                }
-//            }
-//
-//            else{
-//                System.out.println("Manufacturer name is NOT valid");
-//            }
-     }
-
-        private void deleteApp(){
-            //todo
+        private void runVehicleStoreMenu() {
+                String option = vehicleStoreMenu();
+                while ((option != null) && (parseInt(option) != 0)) {
+                    switch (parseInt(option)) {
+                        case 1 -> addVehicle();
+                        case 2 -> deleteVehicle();
+                        //case 3 -> JOptionPane.showInputDialog(frame, VehicleAPI.listAllVehicles());
+                        case 4 -> updateVehicle();
+                        default -> showInputDialog("Invalid option entered" + option);
+                    }
+                    option = manufacturerMenu();
+                }
+                runMainMenu();
         }
 
 
+        // public Vehicle(String regNumber, String  model, float cost, Manufacturer manufacturer, int  year) {
+        private String addVehicle() {
+            int vehicleType = tryParseInt(showInputDialog(frame, """
+        Which type of vehicle do you wish to add? 
+        1) Carbon Fuel Car
+        2) Electric Car
+        3) Scooter """, "Add Vehicle", PLAIN_MESSAGE));
 
-    private int vehicleReportsMenu() {
-        System.out.println(""" 
-                ---------- Vehicle Reports Menu  ---------------------
+            Manufacturer manufacturer = getManufacturerByName();
+            if (manufacturer != null){
+                String regNumber = showInputDialog(frame, "Please enter Reg number of new Vehicle: ", "Add Vehicle", QUESTION_MESSAGE);
+
+
+                if (vehicleAPI.isValidNewRegNumber(regNumber)){
+                    String model = showInputDialog(frame, "model : ");
+                    float cost = tryParseFloat(showInputDialog(frame, "cost : ", "Add Vehicle", QUESTION_MESSAGE));
+                    int year = tryParseInt(showInputDialog(frame, "Year of registration", "Add Vehicle", QUESTION_MESSAGE));
+                    switch (vehicleType) {
+                        case 1, 2 -> {
+                            int power = tryParseInt(showInputDialog(frame, "power :", "Add Vehicle", QUESTION_MESSAGE));
+                            int secs0To60 = tryParseInt(showInputDialog(frame, "time from 0 to 60 :", "Add Vehicle", QUESTION_MESSAGE));
+                            int  topSpeed = tryParseInt(showInputDialog(frame, "top speed :", "Add Vehicle", QUESTION_MESSAGE);
+                            float torque = tryParseFloat(showInputDialog(frame, "power:", "Add Vehicle", QUESTION_MESSAGE);
+                            switch (vehicleType) {
+                                case 1-> {
+                                    float fuelConsumption = tryParseFloat(showInputDialog(frame, "Fuel Consumption:", "Add Vehicle", QUESTION_MESSAGE));
+                                    float carbonEmission = tryParseFloat(showInputDialog(frame, "Carbon Emission", "Add Vehicle", QUESTION_MESSAGE));
+                                    boolean automatic = Utilities.numToBoolean(showOptionDialog(frame, "Is the car an Automatic (y/n", "Add Vehicle", YES_NO_OPTION, QUESTION_MESSAGE, null, null, null));
+                                    String fuelType = showInputDialog(frame, "Fuel Type", "Add Vehicle", QUESTION_MESSAGE);
+                                    int engineSize = tryParseInt(showInputDialog(frame, "Engine size:", "Add Vehicle", QUESTION_MESSAGE));
+                                    if(vehicleAPI.addVehicle(new CarbonFuelCar(regNumber, model, cost, manufacturer, year, power, secs0To60, topSpeed, torque, fuelType, fuelConsumption, carbonEmission, engineSize, automatic)))
+                                        showMessageDialog(frame, "Carbon Emission Car Added Successfully", "Add Vehicle", INFORMATION_MESSAGE);
+                                    else
+                                        showMessageDialog(frame, "Carbon Emission Car Not Added", "Add Vehicle", WARNING_MESSAGE);
+                                   }
+                                case 2 -> {
+                                    int range = tryParseInt(showInputDialog(frame, "Range:", "Add Vehicle", QUESTION_MESSAGE));
+                                    float engineKWats = tryParseFloat(showInputDialog(frame, "Engine KWatts:", "Add Vehicle", QUESTION_MESSAGE));
+                                    if(vehicleAPI.addVehicle(new ElectricCar(regNumber, model, cost, manufacturer, year, power, secs0To60, topSpeed, torque, engineKWats, range)))
+                                        showMessageDialog(frame, "Electric Car Added Successfully", "Add Vehicle", INFORMATION_MESSAGE);
+                                    else
+                                        showMessageDialog(frame, "Electric Car Not Added", "Add Vehicle", ERROR_MESSAGE);
+                                }
+                            }
+                        }
+                        case 3 -> {
+                            int power = tryParseInt(showInputDialog(frame, "power :", "Add Vehicle", QUESTION_MESSAGE));
+                            float weight = tryParseFloat(showInputDialog(frame, "weight : ", "Add Vehicle", QUESTION_MESSAGE));
+                            int topRiderWeight = tryParseInt(showInputDialog(frame, "top rider weight:", "Add Vehicle", QUESTION_MESSAGE));
+                            if(vehicleAPI.addVehicle(new Scooter(regNumber, model, cost, manufacturer, year, power, weight, topRiderWeight)))
+                                showMessageDialog(frame, "Scooter Added Successfully", "Add Vehicle", INFORMATION_MESSAGE);
+                            else
+                                showMessageDialog(frame, "Scooter Not Added"< "Add Vehicle", WARNING_MESSAGE);
+                        }
+                    }
+            }
+                else{
+                    System.out.println("Vehicle reg number  already exists.");
+                }
+            }
+
+            else{
+                System.out.println("Manufacturer name is NOT valid");
+            }
+     }
+
+        private void deleteVehicle(){
+            String manufacturerName = showInputDialog(frame, "Please enter the manufacturer name: ", "Delete Maufactorer", QUESTION_MESSAGE);
+            if (manufacturerAPI.removeManufacturerByName(manufacturerName) != null){
+                showMessageDialog(frame, "Delete successful", "Delete Manufacturer", INFORMATION_MESSAGE);
+            }
+            else{
+                showMessageDialog(frame, "Delete not successful", "Delete Manufacturer", ERROR_MESSAGE);
+            }
+        }
+
+        private void listVehicles() {
+
+        }
+
+        private void updateVehicle() {
+
+        }
+
+
+    private String reportsMenu() {
+        return showInputDialog(frame,"""
+               | 1) Manufacturers Overview  | 
+               | 2) Vehicles Overview       |
+               | 0) Return to main menu     |""", "Reports Menu", PLAIN_MESSAGE);
+    }
+
+
+    public void runReportsMenu() {
+        String option = reportsMenu();
+        while((option != null) && (parseInt(option) != 0)) {
+            switch(parseInt(option)) {
+                case 1 -> runManufacturerReports();
+                case 2 -> runVehicleStoreMenu();
+                default -> showMessageDialog(frame, "Invalid option entered" + option, "Reports Menu", ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private String vehicleReportsMenu() {
+        return showInputDialog(frame,"""
                | 1) List all vehicles                                 | 
                | 2) List all Electric Cars                            |
                | 3) List all Carbon Fuel Cars                         |
@@ -230,50 +312,75 @@ public class Driver {
                | 6) List all Vehicles registered after a given year   |
                | 7) List all carbon fuel by fuel type                 |
                | 8) List the top five carbon vehicles                 |
-               | 0) Return to main menu                               | 
-                 ----------------------------------------------------  """);
-        return ScannerInput.readNextInt("==>>");
+               | 0) Return to main menu                               |""", "Vehicle Reports Menu", PLAIN_MESSAGE);
     }
-    private int manufacturerReportsMenu() {
-        System.out.println(""" 
+    private String manufacturerReportsMenu() {
+        return showInputDialog(frame, """ 
                 ---------- Manufacturers Reports Menu  -------------
                | 1) List Manufacturers                              | 
                | 2) List Manufacturers from a given manufacturer    |
                | 3) List Manufacturers by a given name              |
                | 0) Return to main menu                             | 
-                 ---------------------------------------------------  """);
-        return ScannerInput.readNextInt("==>>");
+                 ---------------------------------------------------  """, "Manufacturer's Reports Menu", PLAIN_MESSAGE);
     }
+
+
     public void runManufacturerReports() {
-        int option = manufacturerReportsMenu();
-        while (option != 0) {
-            switch (option) {
-                case 1-> System.out.println(manufacturerAPI.listManufacturers());
-  //              case 2-> listAllVehiclesFromaGivenManufacturer();   todo write listAllVehiclesFromaGivenManufacturer
-                case 3-> System.out.println("todo");
-                default->  System.out.println("Invalid option entered" + option);
+        String option = manufacturerReportsMenu();
+        while ((option != null) && (parseInt(option) != 0)) {
+            switch (parseInt(option)) {
+                case 1-> showMessageDialog(frame, manufacturerAPI.listManufacturers());
+                case 2-> listAllVehiclesFromAGivenManufacturer();
+                case 3-> showMessageDialog(frame, "todo");
+                default->  showMessageDialog(frame, "Invalid option entered" + option, "Manufacturer Report", ERROR_MESSAGE);
             }
-            ScannerInput.readNextLine("\n Press the enter key to continue");
             option =  manufacturerReportsMenu();
         }
     }
 
 
-//    public void listAllVehiclesFromaGivenManufacturer() {
-//        String manu  = ScannerInput.readNextLine("What manufacturer you want a list of cars for?  : ");
-//        Manufacturer m = manufacturerAPI.getManufacturerByName(manu);
-//        if (!(m == null))
-//        System.out.println(vehicleAPI.listAllVehicleByChosenManufacturer(m));     todo write listAllVehicleByChosenManufacturer()
-//        else
-//            System.out.println("No manufacturer with tha name exists");
-//    }
+    public void listAllVehiclesFromAGivenManufacturer() {
+        String manu  = showInputDialog(frame, "What manufacturer you want a list of cars for?  : ", "Manufacturer Report", QUESTION_MESSAGE);
+        Manufacturer m = manufacturerAPI.getManufacturerByName(manu);
+        if (m != null)
+            showMessageDialog(frame, vehicleAPI.listAllVehicleByChosenManufacturer(m), "Manufacturer Report", INFORMATION_MESSAGE);
+        else
+            showMessageDialog(frame, "No manufacturer with tha name exists", "Manufacturer Report", ERROR_MESSAGE);
+    }
 
+
+
+    private String getValidRegNumber(){
+            String vehicleRegNumber = showInputDialog(frame, "Vehicle Reg Number (must be unique): ", "Manufacturer Report", QUESTION_MESSAGE);
+            if (vehicleAPI.isValidNewRegNumber(vehicleRegNumber)) {
+                return vehicleRegNumber;
+            } else {
+                showMessageDialog(frame, "App name already exists / is not valid.", "Error", ERROR_MESSAGE);
+                return "";
+            }
+        }
+
+    private Manufacturer getManufacturerByName(){
+        String manufacturerName = showInputDialog(frame, "Please enter the manufacturer's name: ", "Get Manufacturer By Name", QUESTION_MESSAGE);
+        if (manufacturerAPI.isValidManufacturer(manufacturerName)) {
+            return manufacturerAPI.getManufacturerByName(manufacturerName);
+        }
+        else{
+            return null;
+        }
+    }
 
     //--------------------------------------------------
     //  Persistence Menu Items
     //--------------------------------------------------
 
     private void saveAllData() {
+        /*public void save() throws Exception {
+            XStream xstream = new XStream(new DomDriver());
+            ObjectOutputStream out = xstream.createObjectOutputStream(new FileWriter());
+            out.writeObject(vehicleAPI);
+            out.close();
+        }*/
         // TODO try-catch to save the developers to XML file
         // TODO try-catch to save the apps in the store to XML file
     }
@@ -283,25 +390,6 @@ public class Driver {
         // TODO try-catch to load the apps in the store from XML file
     }
 
-//    private String getValidRegNumber(){
-//            String vehicleRegNumber = ScannerInput.readNextLine("\tVehicle Reg Number (must be unique): ");
-//            if (vehicleAPI.isValidNewRegNumber(vehicleRegNumber)) {
-//                return vehicleRegNumber;
-//            } else {
-//                System.err.println("\tApp name already exists / is not valid.");
-//                return "";
-//            }
-//        }
-
-        private Manufacturer getManufacturerByName(){
-            String manufacturerName = ScannerInput.readNextLine("Please enter the manufacturer's name: ");
-            if (manufacturerAPI.isValidManufacturer(manufacturerName)){
-                return manufacturerAPI.getManufacturerByName(manufacturerName);
-            }
-            else{
-                return null;
-            }
-        }
 
 
     }

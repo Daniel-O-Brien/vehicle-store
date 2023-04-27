@@ -3,6 +3,9 @@ package utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Integer.parseInt;
+import static java.lang.Float.parseFloat;
+
 public class Utilities {
 
     /**
@@ -81,5 +84,45 @@ public class Utilities {
 
     public static boolean isValidIndex(List list, int indexToCheck){
         return ((indexToCheck >= 0) && (indexToCheck < list.size()));
+    }
+
+    /**
+     * This method returns an int greater than 0 if the String can be parsed to an Int
+     *
+     * @param str The string to be parsed to int.
+     * @return Returns an int greater than 0 if the string can be parsed
+     */
+
+    public static int tryParseInt(String str) {
+        int parsedInt;
+        try {
+            parsedInt = parseInt(str);
+        }
+        catch(NumberFormatException e) {
+            parsedInt = -1;
+        }
+        return parsedInt;
+    }
+
+    /**
+     * This method returns a float greater than 0 if the String can be parsed to an Int
+     *
+     * @param str The string to be parsed to int.
+     * @return Returns a float greater than 0 if the string can be parsed
+     */
+
+    public static float tryParseFloat(String str) {
+        float parsedFloat;
+        try {
+            parsedFloat = parseFloat(str);
+        }
+        catch(NumberFormatException e) {
+            parsedFloat = -1;
+        }
+        return parsedFloat;
+    }
+
+    public static boolean numToBoolean(int intToConvert) {
+        return intToConvert == 0;
     }
 }

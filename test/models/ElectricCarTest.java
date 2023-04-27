@@ -11,10 +11,10 @@ public class ElectricCarTest {
 
         @BeforeEach
         void setup() {
-            carValidAtBottomEdge = new ElectricCar("notTesting", "NotTesting", 0, null, 0, 120, 4, 50, 100, 40, 100);
-            carInValidBelow = new ElectricCar("notTesting", "NotTesting", 0, null, 0, 119, 3, 49, 99, 39, 99);
-            carValidAtTopEdge = new ElectricCar("notTesting", "NotTesting", 0, null, 0, 300, 25, 3000, 400, 60, 500);
-            carValidOverTopEdge = new ElectricCar("notTesting", "NotTesting", 0, null, 0, 301, 26, 3001, 401, 61, 501);
+            carValidAtBottomEdge = new ElectricCar("notTesting", "NotTesting", 0, null, 2021, 120, 4, 50, 100, 40, 100);
+            carInValidBelow = new ElectricCar("notTesting", "NotTesting", 0, null, 2021, 119, 3, 49, 99, 39, 99);
+            carValidAtTopEdge = new ElectricCar("notTesting", "NotTesting", 0, null, 2021, 300, 25, 3000, 400, 60, 500);
+            carValidOverTopEdge = new ElectricCar("notTesting", "NotTesting", 0, null, 2021, 301, 26, 3001, 401, 61, 501);
         }
 
         @Nested
@@ -35,6 +35,7 @@ public class ElectricCarTest {
                 assertEquals(500, carValidAtTopEdge.getRange());
                 assertEquals(100, carValidOverTopEdge.getRange());
             }
+
 
         }
 
