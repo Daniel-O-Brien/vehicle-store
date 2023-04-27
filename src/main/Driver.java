@@ -12,8 +12,6 @@ import utils.Utilities;
 
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.*;
-import static java.lang.Integer.parseInt;
-import static java.lang.Float.parseFloat;
 import static utils.Utilities.tryParseFloat;
 import static utils.Utilities.tryParseInt;
 
@@ -37,13 +35,12 @@ public class Driver {
 
             vehicleAPI = new VehicleAPI(new File("vehicles.xml"));
             manufacturerAPI = new ManufacturerAPI(new File("manufacturers.xml"));
-
             loadAllData();
             runMainMenu();
         }
 
-    private String mainMenu() {
-        return showInputDialog(frame, """
+    private int mainMenu() {
+        return tryParseInt(showInputDialog(frame, """
                         1) Manufacturer CRUD MENU
                         2) Vehicle Store CRUD MENU
                         3) Reports MENU
@@ -56,17 +53,17 @@ public class Driver {
                         11) Load all
                         --------------------------------
                         0) Exit
-                        --------------------------------""", "Vehicle Store", PLAIN_MESSAGE);
+                        --------------------------------""", "Vehicle Store", PLAIN_MESSAGE));
     }
 
         private void runMainMenu() {
-            String option = mainMenu();
-            while ((option != null) && (parseInt(option) != 0)) {
-                switch (parseInt(option)) {
+            int option = mainMenu();
+            while ((option != -1) && (option != 0)) {
+                switch (option) {
                     case 1-> runManufacturerMenu();
                     case 2 -> runVehicleStoreMenu();
-                    case 3 -> reportsMenu();
-                    //case 4 -> TODO run the search Manufacturers menu and associated methods (your design here)
+                    case 3 -> runReportsMenu();
+//                    case 4 -> runSearchManufacturers();
                    // case 5 ->TODO run the search Vehicles menu and associated methods (your design here)
                     // case 6 ->TODO sorting menu and associated (your design here)
                     case 10 -> saveAllData();
@@ -79,7 +76,6 @@ public class Driver {
         }
 
         private void exitApp(){
-            saveAllData();
             int option = showConfirmDialog(frame, "Are you sure you want to exit?", "Exit App", YES_NO_OPTION, QUESTION_MESSAGE);
             if(option == 0)
                 System.exit(0);
@@ -90,8 +86,8 @@ public class Driver {
         //----------------------
         //  Developer Menu Items
         //----------------------
-        private String manufacturerMenu() {
-            return showInputDialog(frame, """
+        private int manufacturerMenu() {
+            return tryParseInt(showInputDialog(frame, """
                1) Add a manufacturer
                2) Delete a manufacturer
                3) Update manufacturer details
@@ -99,13 +95,13 @@ public class Driver {
                5) Find a manufacturer
                6) List vehicles by manufacturer name
                0) Return to main menu
-               ----------------------------------""", "Manufacturer Menu", PLAIN_MESSAGE);
+               ----------------------------------""", "Manufacturer Menu", PLAIN_MESSAGE));
         }
 
         private void runManufacturerMenu() {
-            String option = manufacturerMenu();
-            while ((option != null) && (parseInt(option) != 0)) {
-                switch (parseInt(option)) {
+            int option = manufacturerMenu();
+            while ((option != -1) && (option != 0)) {
+                switch (option) {
                     case 1 -> addManufacturer();
                     case 2 -> deleteManufacturer();
                     case 3 -> updateManufacturer();
@@ -116,7 +112,6 @@ public class Driver {
                 }
                 option = manufacturerMenu();
             }
-            runMainMenu();
         }
 
         private void addManufacturer() {
@@ -144,7 +139,7 @@ public class Driver {
         private void updateManufacturer(){
             Manufacturer manufacturer = getManufacturerByName();
             if (manufacturer != null){
-                int numEmployees= parseInt(showInputDialog(frame, "Please enter number of Employees: ", "Update Manufacturer", QUESTION_MESSAGE));
+                int numEmployees= tryParseInt(showInputDialog(frame, "Please enter number of Employees: ", "Update Manufacturer", QUESTION_MESSAGE));
                 if (manufacturerAPI.updateManufacturer(manufacturer.getManufacturerName(), numEmployees))
                     showMessageDialog(frame, "Number of Employees Updated", "Update Manufacturer", INFORMATION_MESSAGE);
                 else
@@ -172,20 +167,20 @@ public class Driver {
         //  App Store Menu
         //---------------------
 
-    private String vehicleStoreMenu() {
-        return showInputDialog(frame, """
+    private int vehicleStoreMenu() {
+        return tryParseInt(showInputDialog(frame, """
                 1) Add a vehicle
                 2) Delete a vehicle
                 3) List all vehicles
                 4) Update vehicle
-                0) Return to main menu """, "Vehicle Store Menu", PLAIN_MESSAGE);
+                0) Return to main menu """, "Vehicle Store Menu", PLAIN_MESSAGE));
 
     }
 
         private void runVehicleStoreMenu() {
-                String option = vehicleStoreMenu();
-                while ((option != null) && (parseInt(option) != 0)) {
-                    switch (parseInt(option)) {
+                int option = vehicleStoreMenu();
+                while ((option != -1) && (option != 0)) {
+                    switch (option) {
                         case 1 -> addVehicle();
                         case 2 -> deleteVehicle();
                         //case 3 -> JOptionPane.showInputDialog(frame, VehicleAPI.listAllVehicles());
@@ -194,33 +189,32 @@ public class Driver {
                     }
                     option = manufacturerMenu();
                 }
-                runMainMenu();
         }
 
 
         // public Vehicle(String regNumber, String  model, float cost, Manufacturer manufacturer, int  year) {
-        private String addVehicle() {
+        private void addVehicle() {
             int vehicleType = tryParseInt(showInputDialog(frame, """
         Which type of vehicle do you wish to add? 
         1) Carbon Fuel Car
         2) Electric Car
-        3) Scooter """, "Add Vehicle", PLAIN_MESSAGE));
+        3) Scooter""", "Add Vehicle", PLAIN_MESSAGE));
 
-            Manufacturer manufacturer = getManufacturerByName();
+
+            Manufacturer manufacturer = manufacturerAPI.getManufacturerByName(showInputDialog(frame, "Enter Manufacturer", "Add Vehicle", QUESTION_MESSAGE));
             if (manufacturer != null){
                 String regNumber = showInputDialog(frame, "Please enter Reg number of new Vehicle: ", "Add Vehicle", QUESTION_MESSAGE);
 
-
                 if (vehicleAPI.isValidNewRegNumber(regNumber)){
-                    String model = showInputDialog(frame, "model : ");
+                    String model = showInputDialog(frame, "model: ", "Add Vehicle", QUESTION_MESSAGE);
                     float cost = tryParseFloat(showInputDialog(frame, "cost : ", "Add Vehicle", QUESTION_MESSAGE));
                     int year = tryParseInt(showInputDialog(frame, "Year of registration", "Add Vehicle", QUESTION_MESSAGE));
                     switch (vehicleType) {
                         case 1, 2 -> {
                             int power = tryParseInt(showInputDialog(frame, "power :", "Add Vehicle", QUESTION_MESSAGE));
                             int secs0To60 = tryParseInt(showInputDialog(frame, "time from 0 to 60 :", "Add Vehicle", QUESTION_MESSAGE));
-                            int  topSpeed = tryParseInt(showInputDialog(frame, "top speed :", "Add Vehicle", QUESTION_MESSAGE);
-                            float torque = tryParseFloat(showInputDialog(frame, "power:", "Add Vehicle", QUESTION_MESSAGE);
+                            int  topSpeed = tryParseInt(showInputDialog(frame, "top speed :", "Add Vehicle", QUESTION_MESSAGE));
+                            float torque = tryParseFloat(showInputDialog(frame, "power:", "Add Vehicle", QUESTION_MESSAGE));
                             switch (vehicleType) {
                                 case 1-> {
                                     float fuelConsumption = tryParseFloat(showInputDialog(frame, "Fuel Consumption:", "Add Vehicle", QUESTION_MESSAGE));
@@ -250,27 +244,27 @@ public class Driver {
                             if(vehicleAPI.addVehicle(new Scooter(regNumber, model, cost, manufacturer, year, power, weight, topRiderWeight)))
                                 showMessageDialog(frame, "Scooter Added Successfully", "Add Vehicle", INFORMATION_MESSAGE);
                             else
-                                showMessageDialog(frame, "Scooter Not Added"< "Add Vehicle", WARNING_MESSAGE);
+                                showMessageDialog(frame, "Scooter Not Added", "Add Vehicle", ERROR_MESSAGE);
                         }
                     }
             }
                 else{
-                    System.out.println("Vehicle reg number  already exists.");
+                    showMessageDialog(frame, "Vehicle reg number already exists.", "Add Vehicle", ERROR_MESSAGE);
                 }
             }
 
             else{
-                System.out.println("Manufacturer name is NOT valid");
+                showMessageDialog(frame, "Manufacturer name is NOT valid", "Add Vehicle", ERROR_MESSAGE);
             }
      }
 
         private void deleteVehicle(){
-            String manufacturerName = showInputDialog(frame, "Please enter the manufacturer name: ", "Delete Maufactorer", QUESTION_MESSAGE);
-            if (manufacturerAPI.removeManufacturerByName(manufacturerName) != null){
-                showMessageDialog(frame, "Delete successful", "Delete Manufacturer", INFORMATION_MESSAGE);
+            String regNumber = showInputDialog(frame, "Please enter the registration number: ", "Delete Vehicle", QUESTION_MESSAGE);
+            if (vehicleAPI.deleteVehicleByRegNumber(regNumber) != null){
+                showMessageDialog(frame, "Delete successful", "Delete Vehicle", INFORMATION_MESSAGE);
             }
             else{
-                showMessageDialog(frame, "Delete not successful", "Delete Manufacturer", ERROR_MESSAGE);
+                showMessageDialog(frame, "Delete not successful", "Delete Vehicle", ERROR_MESSAGE);
             }
         }
 
@@ -279,22 +273,75 @@ public class Driver {
         }
 
         private void updateVehicle() {
-
+            int vehicleType = tryParseInt(showInputDialog(frame, """
+                    Which type of vehicle do you wish to update? 
+                    1) Carbon Fuel Car
+                    2) Electric Car
+                    3) Scooter""", "Add Vehicle", PLAIN_MESSAGE));
+            if (vehicleType >= 0 && vehicleType <= 3) {
+                String regNumber = showInputDialog(frame, "Please enter Reg number of Vehicle to Update: ", "Update Vehicle", QUESTION_MESSAGE);
+                if (vehicleAPI.isValidNewRegNumber(regNumber)) {
+                    Manufacturer manufacturer = manufacturerAPI.getManufacturerByName(showInputDialog(frame, "Please enter Manufacturer", "Update Vehicle", QUESTION_MESSAGE));
+                    String model = showInputDialog(frame, "model : ");
+                    float cost = tryParseFloat(showInputDialog(frame, "cost : ", "Update Vehicle", QUESTION_MESSAGE));
+                    int year = tryParseInt(showInputDialog(frame, "Year of registration", "Update Vehicle", QUESTION_MESSAGE));
+                    switch (vehicleType) {
+                        case 1, 2 -> {
+                            int power = tryParseInt(showInputDialog(frame, "power :", "Update Vehicle", QUESTION_MESSAGE));
+                            int secs0To60 = tryParseInt(showInputDialog(frame, "time from 0 to 60 :", "Update Vehicle", QUESTION_MESSAGE));
+                            int topSpeed = tryParseInt(showInputDialog(frame, "top speed :", "Update Vehicle", QUESTION_MESSAGE));
+                            float torque = tryParseFloat(showInputDialog(frame, "power:", "Update Vehicle", QUESTION_MESSAGE));
+                            switch (vehicleType) {
+                                case 1 -> {
+                                    float fuelConsumption = tryParseFloat(showInputDialog(frame, "Fuel Consumption:", "Update Vehicle", QUESTION_MESSAGE));
+                                    float carbonEmission = tryParseFloat(showInputDialog(frame, "Carbon Emission", "Update Vehicle", QUESTION_MESSAGE));
+                                    boolean automatic = Utilities.numToBoolean(showOptionDialog(frame, "Is the car an Automatic (y/n", "Update Vehicle", YES_NO_OPTION, QUESTION_MESSAGE, null, null, null));
+                                    String fuelType = showInputDialog(frame, "Fuel Type", "Update Vehicle", QUESTION_MESSAGE);
+                                    int engineSize = tryParseInt(showInputDialog(frame, "Engine size:", "Update Vehicle", QUESTION_MESSAGE));
+                                    if (vehicleAPI.updateCarbonFuelCar(regNumber, new CarbonFuelCar(regNumber, model, cost, manufacturer, year, power, secs0To60, topSpeed, torque, fuelType, fuelConsumption, carbonEmission, engineSize, automatic)))
+                                        showMessageDialog(frame, "Carbon Emission Car Updated Successfully", "Update Vehicle", INFORMATION_MESSAGE);
+                                    else
+                                        showMessageDialog(frame, "Carbon Emission Car Not Updated", "Update Vehicle", WARNING_MESSAGE);
+                                }
+                                case 2 -> {
+                                    int range = tryParseInt(showInputDialog(frame, "Range:", "Update Vehicle", QUESTION_MESSAGE));
+                                    float engineKWats = tryParseFloat(showInputDialog(frame, "Engine KWatts:", "Update Vehicle", QUESTION_MESSAGE));
+                                    if (vehicleAPI.updateElectricCar(regNumber, new ElectricCar(regNumber, model, cost, manufacturer, year, power, secs0To60, topSpeed, torque, engineKWats, range)))
+                                        showMessageDialog(frame, "Electric Car Updated Successfully", "Update Vehicle", INFORMATION_MESSAGE);
+                                    else
+                                        showMessageDialog(frame, "Electric Car Not Updated", "Update Vehicle", ERROR_MESSAGE);
+                                }
+                            }
+                        }
+                        case 3 -> {
+                            int power = tryParseInt(showInputDialog(frame, "power :", "Update Vehicle", QUESTION_MESSAGE));
+                            float weight = tryParseFloat(showInputDialog(frame, "weight : ", "Update Vehicle", QUESTION_MESSAGE));
+                            int topRiderWeight = tryParseInt(showInputDialog(frame, "top rider weight:", "Update Vehicle", QUESTION_MESSAGE));
+                            if (vehicleAPI.updateScooter(regNumber, new Scooter(regNumber, model, cost, manufacturer, year, power, weight, topRiderWeight)))
+                                showMessageDialog(frame, "Scooter Updated Successfully", "Update Vehicle", INFORMATION_MESSAGE);
+                            else
+                                showMessageDialog(frame, "Scooter Not Updated", "Update Vehicle", ERROR_MESSAGE);
+                        }
+                    }
+                }
+                showMessageDialog(frame, "Not valid registration number", "Update Vehicle", ERROR_MESSAGE);
+            }
+            showMessageDialog(frame, "Not valid option", "Update Vehicle", ERROR_MESSAGE);
         }
 
 
-    private String reportsMenu() {
-        return showInputDialog(frame,"""
+    private int reportsMenu() {
+        return tryParseInt(showInputDialog(frame,"""
                | 1) Manufacturers Overview  | 
                | 2) Vehicles Overview       |
-               | 0) Return to main menu     |""", "Reports Menu", PLAIN_MESSAGE);
+               | 0) Return to main menu     |""", "Reports Menu", PLAIN_MESSAGE));
     }
 
 
     public void runReportsMenu() {
-        String option = reportsMenu();
-        while((option != null) && (parseInt(option) != 0)) {
-            switch(parseInt(option)) {
+        int option = reportsMenu();
+        while((option != -1) && (option != 0)) {
+            switch(option) {
                 case 1 -> runManufacturerReports();
                 case 2 -> runVehicleStoreMenu();
                 default -> showMessageDialog(frame, "Invalid option entered" + option, "Reports Menu", ERROR_MESSAGE);
@@ -302,8 +349,8 @@ public class Driver {
         }
     }
 
-    private String vehicleReportsMenu() {
-        return showInputDialog(frame,"""
+    private int vehicleReportsMenu() {
+        return tryParseInt(showInputDialog(frame,"""
                | 1) List all vehicles                                 | 
                | 2) List all Electric Cars                            |
                | 3) List all Carbon Fuel Cars                         |
@@ -312,23 +359,23 @@ public class Driver {
                | 6) List all Vehicles registered after a given year   |
                | 7) List all carbon fuel by fuel type                 |
                | 8) List the top five carbon vehicles                 |
-               | 0) Return to main menu                               |""", "Vehicle Reports Menu", PLAIN_MESSAGE);
+               | 0) Return to main menu                               |""", "Vehicle Reports Menu", PLAIN_MESSAGE));
     }
-    private String manufacturerReportsMenu() {
-        return showInputDialog(frame, """ 
+    private int manufacturerReportsMenu() {
+        return tryParseInt(showInputDialog(frame, """ 
                 ---------- Manufacturers Reports Menu  -------------
                | 1) List Manufacturers                              | 
                | 2) List Manufacturers from a given manufacturer    |
                | 3) List Manufacturers by a given name              |
                | 0) Return to main menu                             | 
-                 ---------------------------------------------------  """, "Manufacturer's Reports Menu", PLAIN_MESSAGE);
+                 ---------------------------------------------------  """, "Manufacturer's Reports Menu", PLAIN_MESSAGE));
     }
 
 
     public void runManufacturerReports() {
-        String option = manufacturerReportsMenu();
-        while ((option != null) && (parseInt(option) != 0)) {
-            switch (parseInt(option)) {
+        int option = manufacturerReportsMenu();
+        while ((option != -1) && (option != 0)) {
+            switch (option) {
                 case 1-> showMessageDialog(frame, manufacturerAPI.listManufacturers());
                 case 2-> listAllVehiclesFromAGivenManufacturer();
                 case 3-> showMessageDialog(frame, "todo");
@@ -370,27 +417,45 @@ public class Driver {
         }
     }
 
+    private int searchManufacturersMenu() {
+            return tryParseInt(showInputDialog(frame, """
+                    """, "Search Manufacturer", PLAIN_MESSAGE));
+    }
+
+    private void runSearchManufacturersMenu() {
+        int option = searchManufacturersMenu();
+        while ((option != -1) && (option != 0)) {
+            switch (option) {
+                default->  showMessageDialog(frame, "Invalid option entered" + option, "Manufacturer Report", ERROR_MESSAGE);
+            }
+            option =  manufacturerReportsMenu();
+        }
+    }
+
     //--------------------------------------------------
     //  Persistence Menu Items
     //--------------------------------------------------
 
     private void saveAllData() {
-        /*public void save() throws Exception {
-            XStream xstream = new XStream(new DomDriver());
-            ObjectOutputStream out = xstream.createObjectOutputStream(new FileWriter());
-            out.writeObject(vehicleAPI);
-            out.close();
-        }*/
-        // TODO try-catch to save the developers to XML file
-        // TODO try-catch to save the apps in the store to XML file
-    }
+            try{
+                vehicleAPI.save();
+                manufacturerAPI.save();
+                showMessageDialog(frame, "Save Successful", "Save", INFORMATION_MESSAGE);
+            }
+            catch(Exception e) {
+                showMessageDialog(frame, "Error saving", "Save", ERROR_MESSAGE);
+            }
+        }
 
     private void loadAllData() {
-        // TODO try-catch to load the developers from XML file
-        // TODO try-catch to load the apps in the store from XML file
+        try {
+            vehicleAPI.load();
+            manufacturerAPI.load();
+            showMessageDialog(frame, "Loading Successful", "Load", INFORMATION_MESSAGE);
+        }
+        catch(Exception e) {
+            showMessageDialog(frame, "Error Loading", "Load", ERROR_MESSAGE);
+        }
     }
-
-
-
-    }
+}
 

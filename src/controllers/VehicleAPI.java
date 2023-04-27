@@ -66,7 +66,7 @@ public class VehicleAPI implements Serializer{
 
     }
 
-    public boolean updateElectricCar(String string, ElectricCar electricCar) {
+    public boolean updateElectricCar(String regNumber, ElectricCar electricCar) {
         return false;
     }
 

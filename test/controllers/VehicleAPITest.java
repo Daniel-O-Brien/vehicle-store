@@ -105,11 +105,20 @@ public class VehicleAPITest {
     @Nested
     class GettersAndSetters {
 
+        @Test
+        void getVehicleByRegNumber() {
+            assertEquals(electricCarOnBoundary, populatedVehicles.getVehicleByRegNumber("Elec5678");
+        }
     }
 
     @Nested
     class CRUDMethods {
 
+
+        @Test
+        void updateCarbonFuelCar() {
+
+        }
     }
 
     @Nested
