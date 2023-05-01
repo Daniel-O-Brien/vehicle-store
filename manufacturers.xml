@@ -1,0 +1,8 @@
+<object-stream>
+  <list>
+    <models.Manufacturer>
+      <manufacturerName>test</manufacturerName>
+      <numEmployees>123</numEmployees>
+    </models.Manufacturer>
+  </list>
+</object-stream>

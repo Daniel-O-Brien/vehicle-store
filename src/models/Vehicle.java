@@ -86,6 +86,6 @@ public abstract class Vehicle {
             age = "1 year old";
         if(getAge() > 1)
             age = getAge() + " years old";
-        return "Vehicle{" + "regNumber: '" + regNumber + ", model: '" + model + '\'' + ", cost=" + cost + ", manufacturer=" + manufacturer + year + " " + age + '}';
+        return "regNumber: " + regNumber + ", model: " + model + ", cost: " + cost + ", manufacturer: {" + manufacturer + "} year: " + year + ", " + age;
     }
 }

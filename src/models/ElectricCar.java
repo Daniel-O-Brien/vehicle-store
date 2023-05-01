@@ -44,6 +44,6 @@ public class ElectricCar extends Car{
     }
 
     public double getCarbonFootPrint() {
-        return((engineKWatts * super.getAge()) / 20000);
+        return(((engineKWatts*1000) * super.getAge()) / 20000);
     }
 }

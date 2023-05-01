@@ -79,7 +79,16 @@ public class CarbonFuelCar extends Car {
     }
 
     public double getCarbonFootPrint() {
-        return (engineSize * fuelConsumption * carbonEmission * super.getAge()) / 2000;
+        return (engineSize * 1000 * fuelConsumption * carbonEmission * super.getAge()) / 2000;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() +
+                " fuelConsumption: " + fuelConsumption +
+                ", carbonEmission: " + carbonEmission +
+                ", automatic: " + automatic +
+                ", fuelType: " + fuelType +
+                ", engineSize: " + engineSize;
     }
 }
-

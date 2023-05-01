@@ -24,6 +24,12 @@ public class VehicleAPI implements Serializer{
     public void sortByCarbonFootprintDescending() {
     }
 
+    /**
+     * Lists All Carbon Fuel Cars by its fuel type
+     * @param fuelType either diesel or petrol
+     * @return a String of all carbon fuel cars with that fuel type
+     *
+     */
     public String listAllCarbonFuelsByFuelType(String fuelType) {
        if(FuelTypeUtility.validFuelType(fuelType)) {
           String str = "";
@@ -38,15 +44,28 @@ public class VehicleAPI implements Serializer{
        return "Invalid fuel type entered";
     }
 
+    /**
+     * Lists All vehicles after a certain year
+     * @param year the year to list vehicles after
+     * @return a String of all vehicles after given year
+     *
+     */
     public String listAllVehiclesAfterAGivenYear(int year) {
         String str = "";
         for(Vehicle vehicle : vehicles)
             if(vehicle.getYear() >= year)
-                str += vehicle;
+                str += vehicles.indexOf(vehicle) + " " + vehicle;
         if(str != "")
             return str;
         return "No vehicles exist later than " + year;
     }
+
+    /**
+     * gets a vehicle by its registration number
+     * @param regNumber the registration number of vehicle
+     * @return an object of type Vehicle which is the vehicle
+     *
+     */
 
     public Vehicle getVehicleByRegNumber(String regNumber) {
         for(Vehicle vehicle: vehicles)
@@ -55,46 +74,111 @@ public class VehicleAPI implements Serializer{
         return null;
     }
 
+    /**
+     * Lists all vehicles
+     * @return a String of all vehicles
+     *
+     */
     public String listAllVehicles() {
-        if(vehicles != null) {
+        if(!vehicles.isEmpty()) {
             String str = "";
             for (Vehicle vehicle : vehicles)
-                str += vehicle;
+                str += vehicles.indexOf(vehicle) + ": " + vehicle + "\n";
             return str;
         }
         return "No Vehicles";
 
     }
 
+    /**
+     * Updates an electric car
+     * @param regNumber the registration number of an electirc car
+     * @param electricCar object of the updated electric car
+     * @return true if updated
+     *
+     */
+
     public boolean updateElectricCar(String regNumber, ElectricCar electricCar) {
+        Vehicle vehicle = getVehicleByRegNumber(regNumber);
+        if(vehicle != null && vehicle instanceof ElectricCar) {
+            vehicles.set(vehicles.indexOf(vehicle), electricCar);
+            return true;
+        }
         return false;
     }
+
+    /**
+     * sorts the arraylist by cost descending
+     *
+     */
 
     public void sortByCostDescending() {
         for (int i = vehicles.size() -1; i >= 0; i--)
         {
-            int highestIndex = 0;
+            int lowestIndex = 0;
             for (int j = 1; j < i; j++)
             {
-                if (vehicles.get(j).getCost() > vehicles.get(highestIndex).getCost()) {
-                    highestIndex = j;
+                if (vehicles.get(j).getCost() <= vehicles.get(lowestIndex).getCost()) {
+                    lowestIndex = j;
                 }
             }
-            swapProducts(vehicles, i, highestIndex);
+            swapProducts(vehicles, i, lowestIndex);
         }
     }
 
-    public boolean updateCarbonFuelCar(String string, CarbonFuelCar carbonFuelCar) {
+    /**
+     * Updates a carbon fuel car
+     * @param regNumber registration n8umber of carbin fuel car to update
+     * @param carbonFuelCar object of updated carbon fuel car
+     * @return true if updated
+     *
+     */
+
+    public boolean updateCarbonFuelCar(String regNumber, CarbonFuelCar carbonFuelCar) {
+        Vehicle vehicle = getVehicleByRegNumber(regNumber);
+        if(vehicle != null && vehicle instanceof CarbonFuelCar) {
+            vehicles.set(vehicles.indexOf(vehicle), carbonFuelCar);
+            return true;
+        }
         return false;
     }
 
-    public boolean updateScooter(String string, Scooter scooter) {
+    /**
+     * Updates a  scooter
+     * @param regNumber registration n8umber of carbin fuel car to update
+     * @param scooter object of updated carbon fuel car
+     * @return true if updated
+     *
+     */
+
+    public boolean updateScooter(String regNumber, Scooter scooter) {
+        Vehicle vehicle = getVehicleByRegNumber(regNumber);
+        if(vehicle != null && vehicle instanceof Scooter) {
+            vehicles.set(vehicles.indexOf(vehicle), scooter);
+            return true;
+        }
         return false;
     }
 
-    public int numberOfVehicleByChosenManufacturer(Manufacturer manufacturer) {
-        return -1;
+    /**
+     * Gets the number of vehicles by a chosen manufacturer
+     * @param manufacturer the manufacturer to get
+     * @return int of number of vehicles
+     *
+     */
+    public int numberOfVehiclesByChosenManufacturer(Manufacturer manufacturer) {
+        int num = 0;
+        for(Vehicle vehicle : vehicles)
+            if(vehicle.getManufacturer() == manufacturer)
+                num++;
+        return num;
     }
+
+    /**
+     * Gets the number of scooters
+     * @return int of number of scooters
+     *
+     */
 
     public int numberOfScooters() {
         int num = 0;
@@ -103,7 +187,12 @@ public class VehicleAPI implements Serializer{
                 num++;
         return num;
     }
-
+    /**
+     * Lists all vehicles equal to a given year
+     * @param year the year to get vehicles for
+     * @return String of all vehicles
+     *
+     */
     public String listAllVehiclesEqualToAGivenYear(int year) {
         String str = "";
         for(Vehicle vehicle : vehicles)
@@ -114,6 +203,12 @@ public class VehicleAPI implements Serializer{
         return "No vehicles exist for " + year;
     }
 
+    /**
+     * Gets the number of vehicles by a chosen manufacturer
+     * @param manufacturer the manufacturer to get
+     * @return int of number of vehicles
+     *
+     */
     public void sortByCarbonFootprintAscending() {
         for (int i = vehicles.size() -1; i >= 0; i--)
         {

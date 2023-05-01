@@ -70,11 +70,10 @@ public abstract class Car extends Vehicle {
 
     @Override
     public String toString() {
-        return "Car{" +
-                "secs0To60=" + secs0To60 +
-                ", power=" + power +
-                ", torque=" + torque +
-                ", topSpeed=" + topSpeed +
-                '}';
+        return super.toString() +
+                " secs0To60: " + secs0To60 +
+                ", power: " + power +
+                ", torque: " + torque +
+                ", topSpeed: " + topSpeed;
     }
 }

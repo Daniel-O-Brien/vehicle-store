@@ -1,9 +1,6 @@
 package controllers;
 
-import models.CarbonFuelCar;
-import models.ElectricCar;
-import models.Manufacturer;
-import models.Scooter;
+import models.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -11,8 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class VehicleAPITest {
 
@@ -45,7 +41,7 @@ public class VehicleAPITest {
                 kia, 2000, 250, 5, 100);
 
         scooterAboveBoundary = new Scooter("SC 123456", "Speed Scooter X1", 1001,
-                tesla, 2023, 250, 101, 120);
+                tesla, 2024, 1001, 101, 121);
 
         scooterInvalidData = new Scooter(null, null, -1,
                 null, -1, -1, -1, -1);
@@ -85,7 +81,7 @@ public class VehicleAPITest {
         //not included - scooterOnBoundary, scooterInvalidData, electricCarAboveBoundary,
         //               carbonFuelBelowBoundary, carbonFuelInvalidData.
         populatedVehicles.addVehicle(scooterBelowBoundary);     //SCOOT12
-        populatedVehicles.addVehicle(electricCarOnBoundary);    //
+        populatedVehicles.addVehicle(electricCarOnBoundary);    //Elec5678
         populatedVehicles.addVehicle(carbonFuelAboveBoundary);  //Car34567
         populatedVehicles.addVehicle(electricCarBelowBoundary); //MAZ123
         populatedVehicles.addVehicle(scooterAboveBoundary);     //SC 12345
@@ -107,7 +103,13 @@ public class VehicleAPITest {
 
         @Test
         void getVehicleByRegNumber() {
-            assertEquals(electricCarOnBoundary, populatedVehicles.getVehicleByRegNumber("Elec5678");
+            assertEquals(electricCarOnBoundary, populatedVehicles.getVehicleByRegNumber("Elec5678"));
+            assertEquals(null, populatedVehicles.getVehicleByRegNumber("CAR"));
+        }
+
+        @Test
+        void getVehicleByIndex() {
+            assertEquals(electricCarOnBoundary, populatedVehicles.getVehicleByIndex(1));
         }
     }
 
@@ -116,8 +118,49 @@ public class VehicleAPITest {
 
 
         @Test
-        void updateCarbonFuelCar() {
+        void updateElectricCar() {
+            //100->120
+            ElectricCar electricCar = electricCarOnBoundary;
+            populatedVehicles.updateElectricCar(electricCarOnBoundary.getRegNumber(), new ElectricCar("elec32", "elecCar", 1010, tesla, 2013, 200, 10, 100, 105, 45, 105));
+            assertNotEquals(electricCar, electricCarOnBoundary);
+            populatedVehicles.updateElectricCar(electricCarOnBoundary.getRegNumber(), electricCar);
+            assertNotEquals(electricCar, electricCarOnBoundary);
+        }
 
+        @Test
+        void updateCarbonFuelCar() {
+            //100->120
+            CarbonFuelCar carbonFuelCar = carbonFuelOnBoundary;
+            populatedVehicles.updateCarbonFuelCar(carbonFuelOnBoundary.getRegNumber(), new CarbonFuelCar("elec32", "elecCar", 1010, tesla, 2013, 200, 10, 100, 105, "diesel", 15, 2, 1000, true));
+            assertNotEquals(carbonFuelCar, carbonFuelOnBoundary);
+            populatedVehicles.updateCarbonFuelCar(carbonFuelOnBoundary.getRegNumber(), carbonFuelCar);
+            assertNotEquals(carbonFuelCar, carbonFuelOnBoundary);
+        }
+
+        @Test
+        void updateScooter() {
+            //100->120
+            Scooter scooter = scooterOnBoundary;
+            populatedVehicles.updateScooter(scooterOnBoundary.getRegNumber(), new Scooter("elec32", "elecCar", 1010, tesla, 2013, 200, 10, 115));
+            assertNotEquals(scooter, scooterOnBoundary);
+            populatedVehicles.updateScooter(scooterOnBoundary.getRegNumber(), scooter);
+            assertNotEquals(scooter, scooterOnBoundary);
+        }
+
+        @Test
+        void deleteVehicleByRegNumber() {
+            assertEquals(scooterBelowBoundary, populatedVehicles.deleteVehicleByRegNumber("SCOOT12"));
+        }
+
+        @Test
+        void deleteVehicleByIndex() {
+            assertEquals(electricCarOnBoundary, populatedVehicles.deleteVehicleByIndex(1));
+        }
+
+        @Test
+        void isValidNewRegNumber() {
+            assertEquals(false, populatedVehicles.isValidNewRegNumber("SCOOT12"));
+            assertTrue(populatedVehicles.isValidNewRegNumber("Scoot16"));
         }
     }
 
@@ -152,26 +195,106 @@ public class VehicleAPITest {
         }
 
         @Test
+        void listAllCarbonFuelCars() {
+            String vehicles = populatedVehicles.listAllCarbonFuelCars();
+            System.out.println(vehicles);
+            assertTrue(vehicles.contains("Car54321"));
+            assertTrue(vehicles.contains("Car34567"));
+
+            assertTrue(emptyVehicles.listAllCarbonFuelCars().toLowerCase().contains("no carbon fuel cars"));
+        }
+
+        @Test
+        void listAllScooters() {
+            String vehicles = populatedVehicles.listAllScooters();
+            System.out.println(vehicles);
+            assertTrue(vehicles.contains("SCOOT12"));
+            assertTrue(vehicles.contains("SC 12345"));
+
+            assertTrue(emptyVehicles.listAllScooters().toLowerCase().contains("no scooters"));
+        }
+
+        @Test
+        void listAllElectricCars() {
+            String vehicles = populatedVehicles.listAllElectricCars();
+            System.out.println(vehicles);
+            assertTrue(vehicles.contains("Elec987"));
+            assertTrue(vehicles.contains("Elec5678"));
+
+            assertTrue(emptyVehicles.listAllScooters().toLowerCase().contains("no electric cars"));
+        }
+
+        @Test
         void listBySelectedYearReturnsVehiclesWhenVehiclesExistForEnteredYear() {
             System.out.println(populatedVehicles.listAllVehicles());
             assertEquals(6, populatedVehicles.numberOfVehicles());
 
-            String vehicles = populatedVehicles.listAllVehiclesEqualToAGivenYear(2001);
+            String vehicles = populatedVehicles.listAllVehiclesEqualToAGivenYear(2000);
 
             //checks for the objects in the string
             assertTrue(vehicles.contains("Car34567"));
             assertTrue(vehicles.contains("SC 12345"));
         }
+
+        @Test
+        void listAllVehiclesAfterAGivenYear() {
+            String vehicles = populatedVehicles.listAllVehiclesAfterAGivenYear(2000);
+            assertTrue(vehicles.contains("Elec987"));
+            assertTrue(vehicles.contains("Car34567"));
+            assertTrue(vehicles.contains("Car54321"));
+            assertTrue(vehicles.contains("SCOOT12"));
+            assertTrue(vehicles.contains("SCOOT321"));
+
+            assertTrue(emptyVehicles.listAllVehiclesAfterAGivenYear(2001).toLowerCase().contains("no vehicles exist later than 2001"));
+        }
+
+        @Test
+        void listAllCarbonFuelsByFuelType() {
+            String vehicles = populatedVehicles.listAllCarbonFuelsByFuelType("diesel");
+            assertTrue(vehicles.contains("Car1234"));
+            assertTrue(vehicles.contains("Car54321"));
+            assertTrue(vehicles.contains("Car34567"));
+        }
     }
 
     @Nested
-    class ReportingMethods {
+    class NumberMethods {
 
-    }
+        @Test
+        void numberOfVehiclesByChosenManufacturer(){
+            int vehicles = populatedVehicles.numberOfVehiclesByChosenManufacturer(tesla);
+            assertEquals(2, vehicles);
 
-    @Nested
-    class SearchingMethods {
+            assertEquals(0, emptyVehicles.numberOfVehiclesByChosenManufacturer(audi));
+        }
 
+        @Test
+        void numberOfScooters() {
+            int vehicles = populatedVehicles.numberOfScooters();
+            assertEquals(2, vehicles);
+
+            assertEquals(0, emptyVehicles.numberOfScooters());
+        }
+
+        @Test
+        void numberOfCarbonCars() {
+            int vehicles = populatedVehicles.numberOfCarbonCars();
+            assertEquals(2, vehicles);
+
+            assertEquals(0, emptyVehicles.numberOfCarbonCars());
+        }
+
+        @Test
+        void numberOfVehicles() {
+            assertEquals(6, populatedVehicles.numberOfVehicles());
+            assertEquals(0, emptyVehicles.numberOfVehicles());
+        }
+
+        @Test
+        void numberOfElectricVehicles() {
+            assertEquals(2, populatedVehicles.numberOfElectricCars());
+            assertEquals(0, emptyVehicles.numberOfElectricCars());
+        }
     }
 
     @Nested
@@ -202,6 +325,28 @@ public class VehicleAPITest {
             assertEquals(0, emptyVehicles.numberOfVehicles());
             emptyVehicles.sortByCostDescending();
         }
+
+        @Test
+        void sortByCarbonFootprintAscending() {
+            assertEquals(6, populatedVehicles.numberOfVehicles());
+            //checks the order of the objects in the list
+            assertEquals(scooterBelowBoundary, populatedVehicles.getVehicleByIndex(0));
+            assertEquals(electricCarOnBoundary, populatedVehicles.getVehicleByIndex(1));
+            assertEquals(carbonFuelAboveBoundary, populatedVehicles.getVehicleByIndex(2));
+            assertEquals(electricCarBelowBoundary, populatedVehicles.getVehicleByIndex(3));
+            assertEquals(scooterAboveBoundary, populatedVehicles.getVehicleByIndex(4));
+            assertEquals(carbonFuelOnBoundary, populatedVehicles.getVehicleByIndex(5));
+
+            populatedVehicles.sortByCarbonFootprintAscending();
+            assertEquals(scooterAboveBoundary, populatedVehicles.getVehicleByIndex(0));
+            assertEquals(scooterBelowBoundary, populatedVehicles.getVehicleByIndex(1));
+            assertEquals(electricCarBelowBoundary, populatedVehicles.getVehicleByIndex(2));
+            assertEquals(electricCarOnBoundary, populatedVehicles.getVehicleByIndex(3));
+            assertEquals(carbonFuelOnBoundary, populatedVehicles.getVehicleByIndex(4));
+            assertEquals(carbonFuelAboveBoundary, populatedVehicles.getVehicleByIndex(5));
+
+        }
+
     }
 
 }

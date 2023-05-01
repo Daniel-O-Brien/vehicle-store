@@ -63,9 +63,8 @@ public class Driver {
                     case 1-> runManufacturerMenu();
                     case 2 -> runVehicleStoreMenu();
                     case 3 -> runReportsMenu();
-//                    case 4 -> runSearchManufacturers();
-                   // case 5 ->TODO run the search Vehicles menu and associated methods (your design here)
-                    // case 6 ->TODO sorting menu and associated (your design here)
+                    case 4 -> runSearchManufacturersMenu();
+                   // case 5 ->
                     case 10 -> saveAllData();
                     case 11 -> loadAllData();
                     default -> showMessageDialog(frame, "Invalid option entered: " + option, "Error", ERROR_MESSAGE);
@@ -77,8 +76,11 @@ public class Driver {
 
         private void exitApp(){
             int option = showConfirmDialog(frame, "Are you sure you want to exit?", "Exit App", YES_NO_OPTION, QUESTION_MESSAGE);
-            if(option == 0)
+            if(option == 0) {
+                if (showConfirmDialog(frame, "Do you want to save before exiting?", "Exit App", YES_NO_OPTION, QUESTION_MESSAGE) == 0)
+                    saveAllData();
                 System.exit(0);
+            }
             else
                 runMainMenu();
         }
@@ -159,7 +161,7 @@ public class Driver {
 
         private void listVehiclesByManufacturerName(){
             String manufacturer = showInputDialog(frame, "Enter the manufacturer's name:", "List Vehicles By Manufacturer Name", QUESTION_MESSAGE);
-            showMessageDialog(frame, manufacturerAPI.listAllVehiclesByManufacturerName(manufacturer));
+            showMessageDialog(frame, vehicleAPI.listAllVehicleByChosenManufacturer(manufacturerAPI.getManufacturerByName(manufacturer)));
         }
 
 
@@ -183,11 +185,11 @@ public class Driver {
                     switch (option) {
                         case 1 -> addVehicle();
                         case 2 -> deleteVehicle();
-                        //case 3 -> JOptionPane.showInputDialog(frame, VehicleAPI.listAllVehicles());
+                        case 3 -> JOptionPane.showMessageDialog(frame, vehicleAPI.listAllVehicles(), "List Vehicles", PLAIN_MESSAGE);
                         case 4 -> updateVehicle();
-                        default -> showInputDialog("Invalid option entered" + option);
+                        default -> showInputDialog("Invalid option entered: " + option);
                     }
-                    option = manufacturerMenu();
+                    option = vehicleStoreMenu();
                 }
         }
 
@@ -268,10 +270,6 @@ public class Driver {
             }
         }
 
-        private void listVehicles() {
-
-        }
-
         private void updateVehicle() {
             int vehicleType = tryParseInt(showInputDialog(frame, """
                     Which type of vehicle do you wish to update? 
@@ -280,7 +278,7 @@ public class Driver {
                     3) Scooter""", "Add Vehicle", PLAIN_MESSAGE));
             if (vehicleType >= 0 && vehicleType <= 3) {
                 String regNumber = showInputDialog(frame, "Please enter Reg number of Vehicle to Update: ", "Update Vehicle", QUESTION_MESSAGE);
-                if (vehicleAPI.isValidNewRegNumber(regNumber)) {
+                if (vehicleAPI.getVehicleByRegNumber(regNumber) != null) {
                     Manufacturer manufacturer = manufacturerAPI.getManufacturerByName(showInputDialog(frame, "Please enter Manufacturer", "Update Vehicle", QUESTION_MESSAGE));
                     String model = showInputDialog(frame, "model : ");
                     float cost = tryParseFloat(showInputDialog(frame, "cost : ", "Update Vehicle", QUESTION_MESSAGE));
@@ -290,7 +288,7 @@ public class Driver {
                             int power = tryParseInt(showInputDialog(frame, "power :", "Update Vehicle", QUESTION_MESSAGE));
                             int secs0To60 = tryParseInt(showInputDialog(frame, "time from 0 to 60 :", "Update Vehicle", QUESTION_MESSAGE));
                             int topSpeed = tryParseInt(showInputDialog(frame, "top speed :", "Update Vehicle", QUESTION_MESSAGE));
-                            float torque = tryParseFloat(showInputDialog(frame, "power:", "Update Vehicle", QUESTION_MESSAGE));
+                            float torque = tryParseFloat(showInputDialog(frame, "torque:", "Update Vehicle", QUESTION_MESSAGE));
                             switch (vehicleType) {
                                 case 1 -> {
                                     float fuelConsumption = tryParseFloat(showInputDialog(frame, "Fuel Consumption:", "Update Vehicle", QUESTION_MESSAGE));
@@ -324,9 +322,11 @@ public class Driver {
                         }
                     }
                 }
-                showMessageDialog(frame, "Not valid registration number", "Update Vehicle", ERROR_MESSAGE);
+                else
+                    showMessageDialog(frame, "Not valid registration number", "Update Vehicle", ERROR_MESSAGE);
             }
-            showMessageDialog(frame, "Not valid option", "Update Vehicle", ERROR_MESSAGE);
+            else
+                showMessageDialog(frame, "Not valid option", "Update Vehicle", ERROR_MESSAGE);
         }
 
 
@@ -338,7 +338,7 @@ public class Driver {
     }
 
 
-    public void runReportsMenu() {
+    private void runReportsMenu() {
         int option = reportsMenu();
         while((option != -1) && (option != 0)) {
             switch(option) {
@@ -362,23 +362,20 @@ public class Driver {
                | 0) Return to main menu                               |""", "Vehicle Reports Menu", PLAIN_MESSAGE));
     }
     private int manufacturerReportsMenu() {
-        return tryParseInt(showInputDialog(frame, """ 
-                ---------- Manufacturers Reports Menu  -------------
-               | 1) List Manufacturers                              | 
-               | 2) List Manufacturers from a given manufacturer    |
-               | 3) List Manufacturers by a given name              |
-               | 0) Return to main menu                             | 
+        return tryParseInt(showInputDialog(frame, """
+               | 1) List Manufacturers
+               | 2) List Manufacturers from a given manufacturer
+               | 0) Return to main menu
                  ---------------------------------------------------  """, "Manufacturer's Reports Menu", PLAIN_MESSAGE));
     }
 
 
-    public void runManufacturerReports() {
+    private void runManufacturerReports() {
         int option = manufacturerReportsMenu();
         while ((option != -1) && (option != 0)) {
             switch (option) {
                 case 1-> showMessageDialog(frame, manufacturerAPI.listManufacturers());
                 case 2-> listAllVehiclesFromAGivenManufacturer();
-                case 3-> showMessageDialog(frame, "todo");
                 default->  showMessageDialog(frame, "Invalid option entered" + option, "Manufacturer Report", ERROR_MESSAGE);
             }
             option =  manufacturerReportsMenu();
@@ -386,7 +383,7 @@ public class Driver {
     }
 
 
-    public void listAllVehiclesFromAGivenManufacturer() {
+    private void listAllVehiclesFromAGivenManufacturer() {
         String manu  = showInputDialog(frame, "What manufacturer you want a list of cars for?  : ", "Manufacturer Report", QUESTION_MESSAGE);
         Manufacturer m = manufacturerAPI.getManufacturerByName(manu);
         if (m != null)
@@ -419,6 +416,7 @@ public class Driver {
 
     private int searchManufacturersMenu() {
             return tryParseInt(showInputDialog(frame, """
+                    1) List manufacturers
                     """, "Search Manufacturer", PLAIN_MESSAGE));
     }
 
@@ -426,6 +424,7 @@ public class Driver {
         int option = searchManufacturersMenu();
         while ((option != -1) && (option != 0)) {
             switch (option) {
+                case 1 -> showMessageDialog(frame, manufacturerAPI.listManufacturers(), "Search Manufacturers", INFORMATION_MESSAGE);
                 default->  showMessageDialog(frame, "Invalid option entered" + option, "Manufacturer Report", ERROR_MESSAGE);
             }
             option =  manufacturerReportsMenu();
